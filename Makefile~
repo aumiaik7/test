@@ -1,0 +1,4 @@
+calc: calc3.y calc3.lex
+	bison -d calc3.y
+	flex  -o calc3.lex.c calc3.lex
+	gcc  -o calc calc3.lex.c calc3.tab.c -lfl -lm

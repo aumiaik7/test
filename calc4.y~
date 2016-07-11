@@ -1,0 +1,65 @@
+%{
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#define YYSTYPE double
+
+%}
+
+%token NUMBER
+%token PLUS MINUS TIMES DIVIDE POWER
+%token SQRT ABS SIN COS TAN LOG LOG10 LOG2
+%token PI E
+%token END
+
+%right PLUS MINUS 
+%right TIMES DIVIDE
+%right NEG
+%right POWER SQRT ABS SIN COS TAN LOG LOG10 LOG2
+%right PI E
+
+%start Input
+%%
+
+Input:
+    
+     | Input Line
+;
+
+Line:
+     END
+     | Expression END { printf("Result: %f\n", $1); }
+;
+
+Expression:
+     NUMBER { $$=$1; }
+| Expression Expression PLUS { $$=$1+$2; printf("Result: %f\n", $1, " ", $2) }
+| Expression Expression MINUS { $$=$1-$2; }
+| Expression Expression TIMES { $$=$1*$2; }
+| Expression Expression DIVIDE { $$=$1/$2; }
+| Expression Expression POWER { $$=pow($1,$2); }
+| Expression ABS { $$=fabs($1); }
+| Expression SQRT { $$=sqrt($1); }
+| Expression NEG %prec NEG { $$=-$1; }
+| Expression SIN { $$=sin(M_PI/180*$1); }
+| Expression COS { $$=cos(M_PI/180*$1); }
+| Expression TAN { $$=tan(M_PI/180*$1); }
+| Expression LOG { $$=log($1); }
+| Expression LOG10 { $$=log10($1); }
+| Expression LOG2 { $$=log2($1); }
+| PI { $$=M_PI; }
+| E { $$=M_E; } 
+;
+
+%%
+
+int yyerror(char *s) {
+  printf("%s\n", s);
+}
+
+int main() {
+  if (yyparse())
+     fprintf(stderr, "Successful parsing.\n");
+  else
+     fprintf(stderr, "error found.\n");
+}
